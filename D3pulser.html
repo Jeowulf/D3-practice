@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      #map-canvas {
+        width: 110vw;
+        height: 200vw;
+      }
+      svg {
+        background: rgba(0,0,0, .3);
+        z-index: 50;
+        width: 110vw;
+        height: 200vw;
+        position: relative;
+        pointer-events: none;
+        bottom: 200vw;
+      }
+      .map {
+        z-index: 40;
+        position: relative;
+      }
+      .pulses, .pulses svg {
+        position: absolute;
+      }
+      circle {
+        fill: rgba(0,255,255, .35);
+        stroke: rgba(0,255,255,1);
+        position: relative;
+        z-index: 60;
+      }
+      .innerCircle {
+        fill: rgba(0,255,255, 1);
+      }
+    </style>
+    <script class="map" src="https://maps.googleapis.com/maps/api/js"></script>
+    <script>
+      function initialize() {
+        var mapCanvas = document.getElementById('map-canvas');
+        var mapOptions = {
+          center: new google.maps.LatLng(33.772570, -84.366485),
+          zoom: 16,
+          mapTypeId: google.maps.MapTypeId.ROADMAP //mapTypeId is used to specify what type of map to use. Your choices are ROADMAP, SATELLITE, HYBRID, or TERRAIN.
+        }
+        var map = new google.maps.Map(mapCanvas, mapOptions)
+      }
+      google.maps.event.addDomListener(window, 'load', initialize);
+    </script>
+  </head>
+  <body>
+    <div id="map-canvas"></div>
+  </body>
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <script>
+    var margin = { //this sets up the canvas/ background
+      top: 40,
+      right: 40,
+      bottom: 40,
+      left: 40
+    }, width = 960 - margin.left - margin.right, //width of canvas
+      height = 500 - margin.top - margin.bottom; //height of canvas
+
+    var data =[ [100,200], [200,300], [300, 300], [300, 400], [400, 500] ]; //1 is the number of circles (altering creates more circles, but only the first one pulses.  they are stacked vertically)
+
+    var svg = d3.select("body")
+      .append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    svg.selectAll("circle")
+      .data(data)
+      .enter()
+      .append("circle")
+      .attr("stroke-width", 20)
+      .attr("r", 10)
+      .attr("cx", function(d) { return d[0]; })//position of pulse on canvas
+      .attr("cy", function(d) { return d[1]; })
+      .each(bigPulse);
+      svg.append("circle")
+             .attr("cx", function(d) { return d[0]; })
+             .attr("cy", function(d) { return d[1]; })
+             .attr("r", 10)
+             .attr("fill", "cyan")
+
+
+
+
+    function bigPulse() {
+      var circle = svg.select("circle");
+      (function repeat() {
+        circle = circle.transition()
+          .duration(20)//circle close
+          .attr("stroke-width", 0.5) //how thick is the stroke at min size
+          .attr("r", 5) //inner circle radius
+          .transition()
+          .duration(2000)//circle open
+          .attr('stroke-width', 0.5) //how thick is the stroke at full size
+          .attr("r", 150) //circle outer radius
+          .ease('sine')
+          .each("end", repeat)
+      })();
+    }
+    function mediumPulse() {
+      var circle = svg.select("circle");
+      (function repeat() {
+        circle = circle.transition()
+          .duration(20)//circle close
+          .attr("stroke-width", 0.5) //how thick is the stroke at min size
+          .attr("r", 5) //inner circle radius
+          .transition()
+          .duration(2000)//circle open
+          .attr('stroke-width', 0.5) //how thick is the stroke at full size
+          .attr("r", 100) //circle outer radius
+          .ease('sine')
+          .each("end", repeat)
+      })();
+    }
+    function smallPulse() {
+      var circle = svg.select("circle");
+      (function repeat() {
+        circle = circle.transition()
+          .duration(20)//circle close
+          .attr("stroke-width", 0.5) //how thick is the stroke at min size
+          .attr("r", 5) //inner circle radius
+          .transition()
+          .duration(2000)//circle open
+          .attr('stroke-width', 0.5) //how thick is the stroke at full size
+          .attr("r", 50) //circle outer radius
+          .ease('sine')
+          .each("end", repeat)
+      })();
+    }
+
+//     dataset.forEach(function(d, i) {
+//     circle.transition().duration(duration).delay(i * duration)
+//         .attr("r", d);
+// });
+  </script>
+</html>
